@@ -1,0 +1,1288 @@
+/* ================== GLOBAL ================== */
+
+/* container for p5 canvas */
+#loading-canvas {
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.scene {
+  position: relative;
+  width: 100vw;
+  height: 100vh;   /* each section defaults to one viewport */
+  overflow: hidden;
+}
+
+/* ========== ROOT STYLES ========== */
+:root {
+  --page-bg: #070008;
+  --text-main: #f9f0e9;
+}
+
+@font-face {
+  font-family: "ManufacturingConsent";
+  src: url("assets/font/ManufacturingConsent-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--page-bg);
+  color: var(--text-main);
+  scroll-behavior: smooth;
+}
+
+/* ================== SECTION 1 — HERO FULLSCREEN ================== */
+
+.hero {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.hero-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* full-frame layers stack */
+.hero-layer.full-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;   /* fills viewport */
+  pointer-events: none;
+}
+
+/* background color layer */
+.layer-bg {
+  z-index: 1;
+}
+
+/* rabbit highlight behind the rabbit */
+.layer-rabbit-highlight {
+  z-index: 2;
+  animation: rabbitGlow 2s ease-in-out infinite;
+}
+
+/* breathing glow */
+@keyframes rabbitGlow {
+  0%   { opacity: 0.60; filter: brightness(1); }
+  50%  { opacity: 0.95; filter: brightness(1.2); }
+  100% { opacity: 0.60; filter: brightness(1); }
+}
+
+/* rabbit image above highlight */
+.layer-rabbit {
+  z-index: 3;
+}
+
+/* detail layers above rabbit */
+.layer-detail-1,
+.layer-detail-2,
+.layer-detail-3 {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 4;
+  mix-blend-mode: normal;
+  opacity: 1;
+}
+
+/* non-full-frame elements (frame, butterfly, text) */
+.layer-butterfly {
+  position: absolute;
+  width: 20%;
+  rotate: 20deg;
+  left: 2%;
+  bottom: 2%;
+  height: auto;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.layer-frame {
+  position: absolute;
+  width: 100vw;
+  height: calc(100vw * 9 / 16);
+  max-height: 100vh;
+  max-width: calc(100vh * 16 / 9);
+  margin: 0 auto;
+  overflow: hidden;
+  z-index: 20;
+}
+
+/* text positioned over the frame */
+.hero-text {
+  position: absolute;
+  left: 43%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  width: 40%;
+  text-align: center;
+  z-index: 21;
+}
+
+.title-button {
+  width: 505px;
+  height: 114px;
+  flex-shrink: 0;
+  color: #ffecab;
+  text-align: center;
+  text-shadow: 4px 5px 4px rgba(0, 0, 0, 0.25);
+  -webkit-text-stroke-width: 0.25px;
+  -webkit-text-stroke-color: #66295b;
+  font-family: "ManufacturingConsent";
+  font-size: 96px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: -1px;
+  cursor: pointer;
+}
+
+.title-button:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.2);
+}
+
+.title-button:active {
+  transform: translateY(2px) scale(0.96);
+}
+
+.title-button.clicked {
+  animation: button-click 0.25s ease-out;
+}
+
+@keyframes button-click {
+  0% { transform: scale(1.05); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+/* ================== GENERIC SCENE LAYOUT (SECTION 2+) ================== */
+.scene-2 {
+  position: relative;
+  width: 100vw;
+  height: 125vh;   /* 1 screen + 1/4 screen */
+}
+
+.scene-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* base class for layers inside scenes */
+.layer {
+  position: absolute;
+  pointer-events: none;
+  height: auto;
+}
+
+/* full-frame images (section 2 background) */
+.full-frame {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ========== SECTION 2 SPECIFIC ========== */
+
+/* background forest */
+.bg-2 {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ========== GLOBAL MOON (fixed – used in sections 2 + 3) ========== */
+
+.global-moon {
+  position: fixed;
+  left: 45%;
+  top: 0;
+  transform: translate(-50%, 0);       /* centered; vertical offset controlled by JS */
+  width: 120vw;                        /* oversized to bleed edges */
+  max-width: 2200px;
+  pointer-events: none;
+  z-index: 1;                          /* > background, < trees/house/rabbit */
+  opacity: 0;                          /* hidden initially; JS will fade in */
+  transition:
+    transform 0.15s linear,
+    opacity 0.4s ease-out;
+}
+
+.moon-2 {
+  width: 100%;
+  height: auto;
+  transform-origin: center center;
+  animation: slow-moon-rotate 60s linear infinite;
+}
+
+/* gentle moon rotation */
+@keyframes slow-moon-rotate {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* tree shadow + main tree positioning derived from design */
+.tree-shadow-2 {
+  position: absolute;
+  width: 110vw;                          /* slightly wider than tree-2 */
+  aspect-ratio: 2768.57 / 1557.32;      /* keep Figma ratio */
+  left: -28%;                            /* synced with tree-2 */
+  bottom: 22%;                           /* touches ground */
+  transform: rotate(-1.159deg);          /* maintain tilt */
+  transform-origin: bottom left;
+  z-index: 5;                             /* under tree-2 */
+  pointer-events: none;
+}
+
+/* main tree */
+.tree-2 {
+  position: absolute; 
+  width: 100vw;
+  aspect-ratio: 2378 / 1337.62;
+  left: -15%;
+  bottom: 25%;
+  transform: rotate(-1.159deg);
+  transform-origin: bottom left;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* bushes */
+.bush-2 {
+  height: auto;
+}
+
+.bush1-2 {
+  position: absolute;
+  width: 40vw;
+  aspect-ratio: 1 / 1;
+  left: 0%;
+  bottom: -15%;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.bush2-2 {
+  position: absolute;
+  width: 20vw;
+  aspect-ratio: 1 / 1;
+  right: 15%;
+  bottom: 10%;
+  z-index: 7;
+  pointer-events: none;
+}
+
+.bush3-2 {
+  position: absolute;
+  width: 45vw;           /* slightly larger than bush1-2 */
+  aspect-ratio: 1 / 1;
+  right: -15%;
+  bottom: -20%;
+  z-index: 9;
+  pointer-events: none;
+}
+
+/* rabbit between bushes */
+.rabbit-2 {
+  position: absolute;
+  width: 43vw;
+  aspect-ratio: 1 / 1;
+  right: 5%;
+  bottom: 0;
+  transform: rotate(-60deg);
+  transform-origin: center center;
+  z-index: 8;                      /* under bush3 (9), above bush1+2 */
+  pointer-events: none;
+}
+
+.ground_section2 {
+  position: absolute;
+  width: 110vw;                       
+  aspect-ratio: 2627 / 1678.5;
+  left: 50%;
+  bottom: 10;                         
+  transform: translateX(-50%);
+  z-index: 4;                          /* under bushes, above background */
+  pointer-events: none;
+}
+
+/* text on the moon */
+.scene2-text {
+  position: absolute;
+  width: max-content;
+  left: 59.5%;
+  top: 45%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 20;
+}
+
+.scene2-title {
+  white-space: nowrap;
+  margin: 0;
+  font-family: "ManufacturingConsent", serif;
+  font-size: 120px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.2;
+  letter-spacing: -2.56px;
+  color: #6D0303;
+  text-shadow: 4px 5px 4px rgba(0,0,0,0.25);
+  white-space: nowrap;             /* prevent wrapping */
+}
+
+/* fluffy title style */
+.title-fluff {
+  color: #ffffff;
+  text-shadow: 4px 5px 4px rgba(0, 0, 0, 0.4);
+}
+
+.scene2-subtitle {
+  margin-top: -20px;
+  font-family: "ManufacturingConsent", serif;
+  font-size: 45px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: -2.56px;
+  color: #6D0303;
+  text-align: left;
+  margin-left: 20px;
+}
+
+/* ================== SECTION 3 (taller scene) ================== */
+
+.scene-3 {
+  position: relative;
+  width: 100vw;
+  height: 180vh;     /* taller than a single viewport */
+  overflow: hidden;
+  z-index: 1;
+}
+
+.scene-3 .scene-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 180vh;
+  overflow: visible;
+}
+
+/* base class for section 3 layers */
+.scene-3 .layer {
+  position: absolute;
+  pointer-events: none;
+  height: auto;
+}
+
+/* section 3 ground */
+.ground_section3 {
+  position: absolute;
+  width: 150vw;
+  aspect-ratio: 2627 / 1478;
+  left: 50%;
+  bottom: 40%;
+  transform: translateX(-50%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ground 2 – sits slightly above the background */
+.ground2_section3 {
+  position: absolute;
+  width: 130vw;
+  aspect-ratio: 1971 / 1517;
+  left: 50%;
+  bottom: -1vh;
+  transform: translateX(-50%);
+  z-index: 4;                      /* above ground_section3, below trees */
+  pointer-events: none;
+}
+
+/* front forest layer */
+.tree-forest-3 {
+  position: absolute;
+  width: 100vw;
+  aspect-ratio: 1965 / 1106;
+  left: 0;
+  top:-10%;
+  z-index: 2;                      /* above ground2_section3 */
+  pointer-events: none;
+}
+
+/* rabbit house */
+.rabbit-house-3 {
+  position: absolute;
+  width: 33vw;
+  aspect-ratio: 1 / 1;
+  left: 40%;
+  bottom: 45%;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* wrapper to contain house + hover text */
+.rabbit-house-3-wrapper {
+  position: absolute;
+  width: 33vw;      /* same as rabbit-house-3 */
+  aspect-ratio: 1/1;
+  left: 40%;
+  bottom: 45%;
+  z-index: 3;
+  pointer-events: auto; /* enable hover */
+}
+
+/* house image inside wrapper */
+.rabbit-house-3-img {
+  width: 100%;
+  height: auto;
+  pointer-events: none; /* hover targets wrapper */
+}
+
+/* poem line 2 (hidden by default) */
+.poem-line-2-hover {
+  white-space: nowrap;
+  position: absolute;
+  inset: 0;              /* centered inside wrapper */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  text-align: center;
+  text-shadow: 4px 5px 4px rgba(0, 0, 0, 0.25);
+  font-family: "ManufacturingConsent", serif;
+  font-size: 60px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 119.91%;
+  letter-spacing: -1.28px;
+
+  opacity: 0;
+  filter: blur(20px);
+  transition: opacity 0.6s ease-out, filter 0.6s ease-out;
+  pointer-events: none;
+}
+
+.bright-style {
+  color: #FFECAB;
+  text-shadow: 4px 5px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* reveal text on hover of the house */
+.rabbit-house-3-wrapper:hover .poem-line-2-hover {
+  opacity: 1;
+  filter: blur(0);
+}
+
+/* dad + daughter rabbit */
+.rabbit-dad-daughter-3 {
+  position: absolute;
+  width: 15vw;
+  aspect-ratio: 1 / 1;
+  left: 35%;
+  bottom: 45%;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* wrapper for bush1 + text, keeps previous position */
+.bush1-3-wrapper {
+  position: absolute;
+  width: 40vw;          /* same as bush1-2 */
+  aspect-ratio: 1 / 1;
+  left: 0%;
+  bottom: 30%;
+  z-index: 6;
+  pointer-events: auto; /* enable hover */
+}
+
+/* bush image fills the wrapper */
+.bush1-3-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* poem line 1 displayed over bush1 */
+.poem-line-1 {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  text-shadow: 4px 5px 4px rgba(100, 79, 79, 0.25);
+  font-family: "ManufacturingConsent", serif;
+  font-size: 64px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 119.91%;
+  letter-spacing: -1.28px;
+  opacity: 0;
+  filter: blur(16px);
+  transition: opacity 0.6s ease-out, filter 0.6s ease-out;
+  pointer-events: none;
+}
+
+.small-style {
+  color: #FFECAB;
+  text-shadow: 4px 5px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* reveal poem line 1 on bush hover */
+.bush1-3-wrapper:hover .poem-line-1 {
+  opacity: 1;
+  filter: blur(0px);
+}
+
+.bush1-3 {
+  position: absolute;
+  width: 40vw;
+  aspect-ratio: 1 / 1;
+  left: 0%;
+  bottom: 30%;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.bush2-3 {
+  position: absolute;
+  width: 22vw;
+  aspect-ratio: 1 / 1;
+  right: 20%;
+  bottom: 45%;
+  z-index: 7;
+  pointer-events: none;
+}
+
+.bush3-3 {
+  position: absolute;
+  width: 45vw;
+  aspect-ratio: 1 / 1;
+  right: -10%;
+  bottom: 25%;
+  z-index: 9;
+  pointer-events: none;
+}
+
+.poem-line-2a {
+  color: #FFECAB;
+  text-align: center;
+  text-shadow: 4px 5px 4px rgba(0, 0, 0, 0.25);
+  font-family: "ManufacturingConsent", serif;
+  font-size: 120px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 119.91%;
+  letter-spacing: -2px;
+}
+
+.poem-text-2 {
+  position: absolute;
+  width: max-content;
+  left: 50%;
+  bottom: 5%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 20;
+  opacity: 0;
+  filter: blur(20px);
+  transition: opacity 0.6s ease-out, filter 0.6s ease-out;
+}
+
+.poem-text-2.visible {
+  opacity: 1;
+  filter: blur(0px);
+}
+.without-shadow {
+  color: #FFF;
+  font-family: "ManufacturingConsent", serif;
+  font-size: 120px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 119.91%;
+  letter-spacing: -2px;
+}
+
+/* ========== SECTION 4  ========== */
+
+/* section 4 sized to image aspect ratio (1820x2048) */
+.scene-4 {
+  position: relative;
+  width: 100vw;
+  height: calc(100vw * 2048 / 1820 * 0.9);
+  min-height: 100vh;                   /* always at least one viewport tall */
+  overflow: hidden;
+  z-index: 1 !important;
+}
+
+/* keep structure consistent with other scenes */
+.scene-4 .scene-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* overlay for p5 canvas in section 4 */
+#section4-canvas {
+  position: absolute;
+  inset: 0;              /* full section 4 */
+  pointer-events: none;  /* don't block interactions */
+  z-index: 3;            /* above background, below foreground layers */
+}
+
+/* example: section 4 background */
+.bg-4 {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;            /* under p5 canvas */
+}
+
+/* background (duplicate block kept for specificity) */
+.bg-4 {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* butterfly layer */
+.butterfly-4 {
+  position: absolute;
+  width: 40vw;
+  aspect-ratio: 1 / 1;
+  left: 130%;
+  transform: translateX(-50%) rotate(180deg);
+  bottom: 110%;
+  z-index: 9999; /* above everything */
+  pointer-events: none;
+}
+
+.footprints-4 {
+  position: absolute;
+  width: 70vw;
+  aspect-ratio: 1324.24 / 1489.73;
+  left: 45%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(-10deg);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* POEM LINE 4 */
+.poem-line-4 {
+  position: absolute;
+  top: 30%;
+  left: 10%;
+
+  color: #FFF;
+  font-family: "ManufacturingConsent", serif;
+  font-size: 55px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 119.91%;
+  letter-spacing: -1.4px;
+
+  text-align: left;
+  z-index: 15;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* POEM LINE 5 */
+.poem-line-5 {
+  position: absolute;
+  top: 55%;
+  right: 10%;
+
+  color: #FFF;
+  font-family: "ManufacturingConsent", serif;
+  font-size: 55px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 119.91%;
+  letter-spacing: -1.4px;
+
+  text-align: right;
+  z-index: 15;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* POEM LINE 6 */
+.poem-line-6 {
+  position: absolute;
+  top: 85%;
+  left: 50%;
+  transform: translateX(-50%);
+
+  color: #FFF;
+  font-family: "ManufacturingConsent", serif;
+  font-size: 70px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 119.91%;
+  letter-spacing: -1.8px;
+
+  text-align: center;
+  z-index: 15;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.footprint-style {
+  color: #C00303;
+}
+
+/* ================== SECTION 5 ================== */
+
+/* ================== VEIN SKETCH OVERLAY (SECTION 5 + 6) ================== */
+/* container for p5 canvas overlay */
+.veins-layer {
+  position: absolute;
+  inset: 0;              
+  z-index: 3;            /* > background, < eyes/heart/text */
+  pointer-events: none;
+}
+
+/* p5-created canvas inside overlay */
+.veins-layer canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  background: transparent !important;
+}
+
+/* ====== SECTION 5 LAYOUT ====== */
+.scene-5 {
+  position: relative;
+  width: 100vw;
+  height: auto;        /* not fixed to 100vh, follows background height */
+  overflow: visible;
+}
+
+.scene-inner-5 {
+  position: relative;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* section 5 background (keeps natural image height) */
+.bg-5 {
+  position: relative;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* combined lines 7–9 in one <p> */
+.poem5-line-7-8-9 {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  max-width: 60vw;
+  color: #FFF;
+  font-family: "ManufacturingConsent", serif;
+  font-size: 60px;
+  font-weight: 400;
+  line-height: 119.91%;
+  letter-spacing: -1.4px;
+  text-align: center;
+
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* highlight styles for keywords */
+.darkness-style {
+  color: #C00303;
+}
+
+.bleeding-style {
+  color: #C00303;
+}
+
+.love-style {
+  color: #C00303;
+}
+
+/* right eye decoration */
+.right-eye-5 {
+  position: absolute;
+  top: -4.5%;
+  right: 18%;
+  width: 33vw;
+  aspect-ratio: 1 / 1;
+  transform: rotate(15deg);
+  z-index: 5;              /* above background, below text */
+  pointer-events: none;
+}
+
+/* left eye decoration */
+.left-eye-5 {
+  position: absolute;
+  width: 33vw;
+  max-width: 745px;
+  aspect-ratio: 745.47 / 745.47;
+  top: 11%;
+  left: 32%;
+  transform: translate(-50%, -50%) rotate(var(--eye-rot, -20deg)) scaleX(-1);
+  transform-origin: center center;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* dad rabbit heart GIF */
+.dad-heart-5 {
+  position: absolute;
+  left: 50%;
+  bottom: 15vh;
+  transform: translateX(-50%);
+
+  width: 50vw;
+  max-width: 1197px;
+  aspect-ratio: 1197 / 1346;
+  height: auto;
+  object-fit: contain;
+
+  pointer-events: none;
+  z-index: 5;                  /* under text, above background */
+}
+
+/* ====================== SECTION 6 ====================== */
+
+.scene-6 {
+  position: relative;
+  width: 100vw;
+  height: auto;
+  overflow: hidden;
+}
+
+/* inner content */
+.scene-inner-6 {
+  position: relative;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* background for section 6: reuses section 5 image but flipped vertically */
+.bg-6 {
+  position: relative;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  z-index: 1;
+
+  /* flip vertically */
+  transform: scaleY(-1);
+  transform-origin: center center;
+}
+
+/* ================== SECTION 6 – ELEMENTS ================== */
+
+/* Wave 1 – large water layer, under most foreground */
+.wave1-6 {
+  position: absolute;
+  width: 120vw;
+  aspect-ratio: 2265 / 2548;
+  left: 50%;
+  bottom: -15%;
+  transform: translateX(-50%);
+  z-index: 4;                         /* above bg-6, below trees */
+  pointer-events: none;
+}
+
+/* Wave 2 – layered above wave1 */
+.wave2-6 {
+  position: absolute;
+  width: 100vw;
+  aspect-ratio: 2223 / 2501;
+  left: 50%;
+  bottom: -30%;
+  transform: translateX(-50%);
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Wolf – right side, above waves */
+.wolf-6 {
+  position: absolute;
+  width: 60vw;
+  max-width: 1339px;
+  aspect-ratio: 1339.2 / 1505.42;
+  right: 20%;
+  bottom: -5%;
+  z-index: 7;
+  pointer-events: none;
+  transform: translate(-50%, -50%) rotate(var(--eye-rot, 15deg)) scaleX(-1);
+}
+
+/* Dad rabbit hand – left side, mirrored */
+.dad-hand-6 {
+  position: absolute;
+  width: 50vw;
+  max-width: 1290px;
+  aspect-ratio: 1290.24 / 1451.47;
+  left: 80%;
+  bottom: -25%;
+  z-index: 7;
+  pointer-events: none;
+  transform: translate(-50%, -50%) rotate(var(--eye-rot, 50deg)) scaleX(-1);
+}
+
+/* Poem line 10 – top-right */
+.poem6-line-10 {
+  position: absolute;
+  top: 55%;
+  right: 5%;
+  max-width: 60vw;
+
+  color: #FFECAB;
+  text-align: right;
+  font-family: "ManufacturingConsent", serif;
+  font-size: 80px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 119.91%;
+  letter-spacing: -1.2px;
+
+  z-index: 10;
+  pointer-events: none;
+}
+
+.met-style {
+  color: #F00;
+  font-family: "ManufacturingConsent", serif;
+  font-size: 80px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 119.91%;
+  letter-spacing: -1.2px;
+}
+
+/* Poem lines 11–12 – lower block */
+.poem6-line-11-12 {
+  position: absolute;
+  top: 82%;
+  left: 30%;
+  transform: translateX(-50%);
+  max-width: 50vw;
+  color: #FFECAB;
+  font-family: "ManufacturingConsent", serif;
+  font-size: 65px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 119%;
+  letter-spacing: -1.3px;
+  text-align: left;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* hidden by default */
+.poem6-line-10,
+.poem6-line-11-12 {
+  opacity: 0;
+  filter: blur(20px);
+  transition: opacity 0.8s ease-out, filter 0.8s ease-out;
+}
+
+/* show line 10 immediately */
+.poem6-line-10.visible {
+  opacity: 1;
+  filter: blur(0px);
+  transition-delay: 0s;
+}
+
+/* show lines 11–12 with delay */
+.poem6-line-11-12.visible {
+  opacity: 1;
+  filter: blur(0px);
+  transition-delay: 0.6s;
+}
+
+/* ====================== SECTION 7 ====================== */
+.scene-7 {
+  position: relative;
+  width: 100vw;
+  height: auto;
+  overflow: hidden;
+}
+
+.scene-inner-7 {
+  position: relative;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* blur overlay for section 7 */
+.blur-filter-7 {
+  position: absolute;
+  width: 120vw;
+  aspect-ratio: 1953 / 2357;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 2;     /* above .bg-7, below poem/text/characters */
+}
+
+/* normal transition settings */
+.the-battle-7,
+.blur-filter-7 {
+  transition: opacity 0.8s ease-out, filter 0.8s ease-out;
+}
+
+/* after click: fade and blur out */
+.section7-reveal .the-battle-7,
+.section7-reveal .blur-filter-7 {
+  opacity: 0;
+  filter: blur(25px);
+  pointer-events: none;
+}
+
+.bg-7 {
+  position: relative;
+  width: 100vw;
+  height: auto;
+  aspect-ratio: 2117 / 2381;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  z-index: 1;                     /* below veins / text */
+}
+
+.the-battle-7-wrapper {
+  position: absolute;
+  left: 10%;
+  top: 15%;
+  transform: translate(-50%, -50%);
+  width: 110vw;
+  max-width: 1562px;
+  aspect-ratio: 1562 / 1757;
+  z-index: 3;        /* above background, below blur/text */
+  pointer-events: auto;
+}
+
+.the-battle-7 {
+  position: absolute;
+  width: 75vw;
+  max-width: 1562px;
+  aspect-ratio: 1562 / 1757;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 3;
+  animation: battleFloatRotate 13s linear infinite;
+  cursor: pointer;
+}
+
+/* subtle rotation animation */
+@keyframes battleFloatRotate {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(180deg); }
+}
+
+/* Poem lines 13–16 block */
+.poem7-line-13-14-15-16 {
+  position: absolute;
+  top: 60%;
+  left: 65%;
+  transform: translateX(-50%);
+  max-width: 100vw;
+  color: #C00303;
+  text-align: center;
+  font-family: "ManufacturingConsent", serif;
+  font-size: 45px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 105%;
+  letter-spacing: -1.3px;
+  white-space: pre-line;   /* preserve line breaks from HTML */
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ====================== SECTION 8 ====================== */
+/* WORD CLOUD canvas layer */
+.words-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;               /* above background, below foreground */
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* p5 canvas inside words-layer */
+.words-layer canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  background: transparent !important;
+}
+
+/* ====== SECTION 8 LAYOUT ====== */
+.scene-8 {
+  position: relative;
+  width: 100vw;
+  height: 110vh;
+  overflow: hidden;
+}
+
+.scene-inner-8 {
+  position: relative;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* section 8 background */
+.bg-8 {
+  position: relative;
+  width: 100vw;
+  height: auto;
+  aspect-ratio: 2117 / 2381;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ====================== SECTION 9 ====================== */
+.scene-9 {
+  position: relative;
+  width: 100vw;
+  height: auto;
+  overflow: hidden;
+}
+
+.scene-inner-9 {
+  position: relative;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* section 9 background */
+.bg-9 {
+  position: relative;
+  width: 100vw;
+  height: auto;
+  aspect-ratio: 2117 / 2381;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Wolf dying illustration */
+.wolf-die-9 {
+  position: absolute;
+  width: 78vw;
+  max-width: 1988px;
+  aspect-ratio: 1988 / 2235;
+  left: 50%;
+  top: 70%;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  pointer-events: none;
+  z-index:4;
+}
+
+/* wave in section 9 */
+.wave-9 {
+  position: absolute;
+  width: 100vw;
+  max-width: 1988px;
+  aspect-ratio: 1988 / 2235;
+  height: auto;
+  left: 50%;
+  bottom: -25%;
+  transform: translateX(-50%);
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* Poem lines 17–20 */
+.poem9-line-17-18-19 {
+  position: absolute;
+  top: 85%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 100vw;
+  color: #FFF;
+  text-align: center;
+  font-family: "ManufacturingConsent", serif;
+  font-size: 60px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 50%;
+  letter-spacing: 1.3px;
+  z-index: 10;
+  white-space: pre-line;
+}
+
+.poem9-line-1 {
+  white-space: nowrap;   /* first line should not wrap */
+}
+
+.justice-style {
+  color: #F00;
+}
+
+/* scale graphic in section 9 */
+.scales-9 {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%);
+  width: 80vw;
+  max-width: 1600px;
+  aspect-ratio: 1600 / 1800;
+  z-index: 2;
+  pointer-events: none;
+}
